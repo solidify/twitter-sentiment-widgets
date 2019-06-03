@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <script src="sdk/scripts/VSS.SDK.min.js"></script>
+    <style type="text/css">
+    .widget-configuration input[type=password] {
+        width: 100%;
+        height: 32px;
+        padding: 3px 5px;
+        position: relative;
+        border:  1px solid;
+        border-color: rgba( 234, 234, 234 ,  1 );
+        border-color: rgba( var(--palette-neutral-8,234, 234, 234) ,  1 );
+    }
+    </style>
+    <script type="text/javascript">
+        // Initialize
+        VSS.init({
+            explicitNotifyLoaded: true,
+            usePlatformStyles: true,
+            usePlatformScripts: true
+        });
+
+        VSS.require(["TFS/Dashboards/WidgetHelpers"],
+            function (WidgetHelpers) {
+                WidgetHelpers.IncludeWidgetConfigurationStyles();
+                VSS.register("TwitterSentimentWidget.Configuration", function () {
+                    var $twitterConsumerKeyInput = $("#twitterConsumerKey input");
+                    var $twitterConsumerKeyValidationErrorText = $("#twitterConsumerKey .validation-error > .validation-error-text");
+                    var $twitterConsumerSecretInput = $("#twitterConsumerSecret input");
+                    var $twitterConsumerSecretValidationErrorText = $("#twitterConsumerSecret .validation-error > .validation-error-text");
+                    var $hashtagToAnalyzeInput = $("#hashtagToAnalyze input");
+                    var $hashtagToAnalyzeValidationErrorText = $("#hashtagToAnalyze .validation-error > .validation-error-text");
+                    var $azureFunctionUrlInput = $("#azureFunctionUrl input");
+                    var $azureFunctionUrlValidationErrorText = $("#azureFunctionUrl .validation-error > .validation-error-text");
+                    var $azureFunctionKeyInput = $("#azureFunctionKey input");
+                    var $azureFunctionKeyValidationErrorText = $("#azureFunctionKey .validation-error > .validation-error-text");
+                    var $csAccessKeyInput = $("#csAccessKey input");
+                    var $csAccessKeyValidationErrorText = $("#csAccessKey .validation-error > .validation-error-text");
+                    var $csEndpointRegionDropDown = $("#csEndpointRegion");
+
+                    return {
+                        getCustomSettings: function() {
+                            // Persist the selected definition
+                            var customSettings = {
+                                data: JSON.stringify({
+                                    twitterConsumerKey: $twitterConsumerKeyInput.val(),
+                                    twitterConsumerSecret: $twitterConsumerSecretInput.val(),
+                                    hashtagToAnalyze: $hashtagToAnalyzeInput.val(),
+                                    azureFunctionUrl: $azureFunctionUrlInput.val(),
+                                    azureFunctionKey: $azureFunctionKeyInput.val(),
+                                    csAccessKey: $csAccessKeyInput.val(),
+                                    csEndpointRegion: $csEndpointRegionDropDown.val()
+                                })
+                            };
+                            return customSettings;
+                        },
+                        validateKeyInput: function($keyInput, $keyInputErrorText) {
+                            if ($keyInput.val().trim().length > 0) {
+                                $keyInputErrorText.parent().css("visibility", "hidden");
+                                return true;
+                            }
+                            $keyInputErrorText.text("Key must be longer than 0.");
+                            $keyInputErrorText.parent().css("visibility", "visible");
+                            return false;
+                        },
+                        validateHashtagInput: function($hashtagToAnalyzeInput, $hashtagToAnalyzeValidationErrorText) {
+                            if ($hashtagToAnalyzeInput.val().trim().length > 0 && $hashtagToAnalyzeInput.val().indexOf("#") == -1) {
+                                $hashtagToAnalyzeValidationErrorText.parent().css("visibility", "hidden");
+                                return true;
+                            }
+                            $hashtagToAnalyzeValidationErrorText.text("Hashtag name without #.");
+                            $hashtagToAnalyzeValidationErrorText.parent().css("visibility", "visible");
+                            return false;
+                        },
+                        validateFunctionUrlInput: function($azureFunctionUrlInput, $azureFunctionUrlValidationErrorText) {
+                            if ($azureFunctionUrlInput.val().trim().length > 0 && /https?:\/\//.test($azureFunctionUrlInput.val())) {
+                                $azureFunctionUrlValidationErrorText.parent().css("visibility", "hidden");
+                                return true;
+                            }
+                            $azureFunctionUrlValidationErrorText.text("URL must start with http:// or https://");
+                            $azureFunctionUrlValidationErrorText.parent().css("visibility", "visible");
+                            return false;
+                        },
+                        load: function (widgetSettings, widgetConfigurationContext) {
+                            var _this = this;
+                            // Retrieve configurations setting$twitterConsumerSecretInputs
+                            var settings = JSON.parse(widgetSettings.customSettings.data);
+
+                            // Set value from settings to input field
+                            if (settings && settings.twitterConsumerKey) {
+                                $twitterConsumerKeyInput.val(settings.twitterConsumerKey);
+                            }
+
+                            // Set value from settings to input $azureFunctionUrlInputfield
+                            if (settings && settings.twitterConsumerSecret) {
+                                $twitterConsumerSecretInput.val(settings.twitterConsumerSecret);
+                            }
+                            // Set value from settings to input $azureFunctionKeyInputfield
+                            if (settings && settings.hashtagToAnalyze) {
+                                $hashtagToAnalyzeInput.val(settings.hashtagToAnalyze);
+                            }
+                            // Set value from settings to input field
+                            if (settings && settings.azureFunctionUrl) {
+                                $azureFunctionUrlInput.val(settings.azureFunctionUrl);
+                            }
+                            // Set value from settings to input field
+                            if (settings && settings.azureFunctionKey) {
+                                $azureFunctionKeyInput.val(settings.azureFunctionKey);
+                            }
+                            // Set value from settings to input field
+                            if (settings && settings.csAccessKey) {
+                                $csAccessKeyInput.val(settings.csAccessKey);
+                            }
+                            // Set value from settings to input field
+                            if (settings && settings.csEndpointRegion) {
+                                $csEndpointRegionDropDown.val(settings.csEndpointRegion);
+                            }
+
+                            $twitterConsumerKeyInput.on("input", function() {
+                                if (_this.validateKeyInput($twitterConsumerKeyInput, $twitterConsumerKeyValidationErrorText)) {
+                                    widgetConfigurationContext.notify(WidgetHelpers.WidgetEvent.ConfigurationChange, WidgetHelpers.WidgetEvent.Args(_this.getCustomSettings()))
+                                }
+                            });
+                            $twitterConsumerSecretInput.on("input", function() {
+                                if (_this.validateKeyInput($twitterConsumerSecretInput, $twitterConsumerSecretValidationErrorText)) {
+                                    widgetConfigurationContext.notify(WidgetHelpers.WidgetEvent.ConfigurationChange, WidgetHelpers.WidgetEvent.Args(_this.getCustomSettings()))
+                                }
+                            });                            
+                            $hashtagToAnalyzeInput.on("input", function() {
+                                if (_this.validateHashtagInput($hashtagToAnalyzeInput, $hashtagToAnalyzeValidationErrorText)) {
+                                    widgetConfigurationContext.notify(WidgetHelpers.WidgetEvent.ConfigurationChange, WidgetHelpers.WidgetEvent.Args(_this.getCustomSettings()))
+                                }
+                            });
+                            $azureFunctionUrlInput.on("input", function() {
+                                if (_this.validateFunctionUrlInput($azureFunctionUrlInput, $azureFunctionUrlValidationErrorText)) {
+                                    widgetConfigurationContext.notify(WidgetHelpers.WidgetEvent.ConfigurationChange, WidgetHelpers.WidgetEvent.Args(_this.getCustomSettings()))
+                                }
+                            });   
+                            $azureFunctionKeyInput.on("input", function() {
+                                if (_this.validateKeyInput($azureFunctionKeyInput, $azureFunctionKeyValidationErrorText)) {
+                                    widgetConfigurationContext.notify(WidgetHelpers.WidgetEvent.ConfigurationChange, WidgetHelpers.WidgetEvent.Args(_this.getCustomSettings()))
+                                }
+                            });
+                            $csAccessKeyInput.on("input", function() {
+                                if (_this.validateKeyInput($csAccessKeyInput, $csAccessKeyValidationErrorText)) {
+                                    widgetConfigurationContext.notify(WidgetHelpers.WidgetEvent.ConfigurationChange, WidgetHelpers.WidgetEvent.Args(_this.getCustomSettings()))
+                                }
+                            });                                                                                 
+                            $csEndpointRegionDropDown.on("change", function () {
+                                var customSettings = _this.getCustomSettings();
+                                var eventName = WidgetHelpers.WidgetEvent.ConfigurationChange;
+                                var eventArgs = WidgetHelpers.WidgetEvent.Args(customSettings);
+                                widgetConfigurationContext.notify(eventName, eventArgs);
+                            });
+
+                            return WidgetHelpers.WidgetStatusHelper.Success();
+                        },
+                        onSave: function () {
+                            var _this = this;
+                            // Output diagnostics info to console
+                            console.log('event: onSave');
+
+                            // Persist the selected definition
+                            var customSettings = _this.getCustomSettings();
+                            return WidgetHelpers.WidgetConfigurationSave.Valid(customSettings);
+                        }
+                    }
+                });
+                VSS.notifyLoadSucceeded();
+            });
+    </script>
+</head>
+
+<body>
+    <div class="widget-configuration">
+        <div class="single-line-text-input" id="twitterConsumerKey">
+            <label>Twitter Consumer Key</label>
+            <input type="password" />
+            <span class="validation-error">
+                    <span class="icon-error-exclamation"></span>
+                    <span class="validation-error-text"></span>
+            </span>
+        </div>
+
+        <div class="single-line-text-input" id="twitterConsumerSecret">
+            <label>Twitter Consumer Secret</label>
+            <input type="password" />
+            <span class="validation-error">
+                    <span class="icon-error-exclamation"></span>
+                    <span class="validation-error-text"></span>
+            </span>
+        </div>
+        <div class="single-line-text-input" id="hashtagToAnalyze">
+            <label>Hashtag to analyze</label>
+            <input type="text" />
+            <span class="validation-error">
+                    <span class="icon-error-exclamation"></span>
+                    <span class="validation-error-text"></span>
+            </span>
+        </div>
+        <div class="single-line-text-input" id="azureFunctionUrl">
+            <label>Azure function url</label>
+            <input type="text" />
+            <span class="validation-error">
+                    <span class="icon-error-exclamation"></span>
+                    <span class="validation-error-text"></span>
+            </span>
+        </div>
+
+        <div class="single-line-text-input" id="azureFunctionKey">
+            <label>Function key</label>
+            <input type="password" />
+            <span class="validation-error">
+                    <span class="icon-error-exclamation"></span>
+                    <span class="validation-error-text"></span>
+            </span>
+        </div>
+
+        <div class="single-line-text-input" id="csAccessKey">
+            <label>Congitive Services access key</label>
+            <input type="password" />
+            <span class="validation-error">
+                    <span class="icon-error-exclamation"></span>
+                    <span class="validation-error-text"></span>
+            </span>
+        </div>
+        <div class="dropdown">
+            <label>Cognitive Services endpoint region</label>
+            <div class="wrapper">
+                <select id="csEndpointRegion">
+                    <option value="westeurope">West Europe</option>
+                    <option value="northeurope">North Europe</option>
+                    <option value="westus">West US</option>
+                    <option value="westus2">West US 2</option>
+                    <option value="eastus">East US</option>
+                    <option value="eastus2">East US 2</option>
+                    <option value="westcentralus">West Central US</option>
+                    <option value="southcentralus">South Central US</option>
+                    <option value="eastasia">East Asia</option>
+                    <option value="southeastasia">Southeast Asia</option>
+                    <option value="australiaeast">Australia East</option>
+                    <option value="brazilsouth">Brazil South</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

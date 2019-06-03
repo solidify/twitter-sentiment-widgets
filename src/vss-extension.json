@@ -1,0 +1,123 @@
+{
+    "manifestVersion": 1,
+    "id": "twitter-sentiment-dashboard-widgets",
+    "version": "0.5.3",
+    "name": "Twitter Sentiment Widgets",
+    "description": "A collection of dashboard widgets for displaying Twitter Sentiment in Azure DevOps.",
+    "helpMarkDown": "[More Information](https://github.com/solidify/twitter-sentiment-widgets)",
+    "publisher": "Solidify-Labs",
+    "icons": {
+        "default": "img/extension-icon.png"
+    },
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "tags": [
+        "twitter",
+        "widgets",
+        "dashboard",
+        "sentiment",
+        "analysis"
+    ],
+    "screenshots": [
+        {
+            "path": "img/screenshots/widgets.png"
+        },
+        {
+            "path": "img/screenshots/configuration.png"
+        }
+    ],
+    "content": {
+        "license": {
+          "path": "Docs/LICENSE"
+        },
+        "details": {
+          "path": "Docs/overview.md"
+        }
+    },
+    "links": {
+        "getstarted": {
+            "uri": "https://github.com/solidify/twitter-sentiment-widgets"
+        },
+        "learn": {
+            "uri": "https://github.com/solidify/twitter-sentiment-widgets"
+        },
+        "license": {
+            "uri": "https://github.com/solidify/twitter-sentiment-widgets"
+        },
+        "support": {
+            "uri": "https://github.com/solidify/twitter-sentiment-widgets/issues"
+        }
+    },
+    "repository": {
+            "type": "git",
+            "uri": "https://github.com/solidify/twitter-sentiment-widgets"
+    },
+    "branding": {
+        "color": "rgb(0, 0, 0)",
+        "theme": "dark"
+    },
+    "categories": [
+        "Azure Boards"
+    ],
+    "contributions": [
+        {
+             "id": "TwitterSentimentWidget.Widget1",
+             "type": "ms.vss-dashboards-web.widget",
+             "targets": [
+                 "ms.vss-dashboards-web.widget-catalog",
+                 "solidify-labs.twitter-sentiment-dashboard-widgets.TwitterSentimentWidget.Configuration"
+             ],
+             "properties": {
+                 "name": "Twitter Sentiment",
+                 "description": "Displays the current twitter sentiment.",
+                 "catalogIconUrl": "img/CatalogIcon.png",
+                 "previewImageUrl": "img/preview1.png",                       
+                 "uri": "twitter-sentiment.html",
+                 "isNameConfigurable": true,
+                 "supportedSizes": [
+                    {
+                        "rowSpan": 1,
+                        "columnSpan": 1
+                    }
+                 ],
+                 "supportedScopes": ["project_team"]
+             }
+         },
+         {
+             "id": "TwitterSentimentWidget.Configuration",
+             "type": "ms.vss-dashboards-web.widget-configuration",
+             "targets": [ "ms.vss-dashboards-web.widget-configuration" ],
+             "properties": {
+                 "name": "Twitter Sentiment  Configuration",
+                 "description": "Configures TwitterSentimentWidget",
+                 "uri": "configuration.html"
+             }
+         }
+    ],
+    "files": [
+        {
+            "path": "twitter-sentiment.html", "addressable": true
+        },
+        {
+            "path": "configuration.html", "addressable": true
+        },
+        {
+            "path": "img", "addressable": true
+        },
+        {
+            "path": "sdk/scripts", "addressable": true
+        },
+        {
+            "path": "Docs", "addressable": true
+        }
+    ],
+    "galleryFlags": [
+        "Public",
+        "Preview"
+    ],
+    "scopes": [
+    ]
+}
